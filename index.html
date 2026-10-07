@@ -1,334 +1,107 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="color-scheme" content="light dark">
-  <title>Attendance Notice</title>
-  <style>
-    :root {
-      --bg: #f3f5f8;
-      --card: #fff;
-      --tx: #1b1f24;
-      --mu: #6b7280;
-      --ac: #2563eb;
-      --ach: #1d4ed8;
-      --on: #fff;
-      --bd: #d5dae1;
-      --ok: #15803d;
-      --okb: #e8f6ee;
-      --er: #b91c1c;
-      --erb: #fdecec;
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Attendance Notice</title>
+<style>
+:root{--bg:#f3f5f8;--card:#fff;--tx:#1b1f24;--mu:#6b7280;--ac:#2563eb;--ach:#1d4ed8;--on:#fff;--bd:#d5dae1;--ok:#15803d;--okb:#e8f6ee;--er:#b91c1c;--erb:#fdecec}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1115;--card:#1a1d23;--tx:#e8eaed;--mu:#9aa1ab;--ac:#6ea0ff;--ach:#8db3ff;--on:#0b1220;--bd:#343942;--ok:#4ade80;--okb:#12261a;--er:#f87171;--erb:#2a1517}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:680px;margin:0 auto;padding:max(20px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(32px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+header{margin-bottom:20px}
+.logo{display:inline-block;background:#fff;border:1px solid var(--bd);border-radius:12px;padding:8px 12px;margin-bottom:16px}
+.logo img{display:block;height:44px;width:auto}
+h1{font-size:clamp(22px,4.5vw,28px);line-height:1.2;margin:0 0 6px}
+.sub{color:var(--mu);margin:0}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:clamp(16px,4vw,28px);box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px 16px}
+.f{min-width:0}.full{grid-column:1/-1}
+label{display:block;font-size:14px;font-weight:600;margin:0 0 6px}
+.opt{font-weight:400;color:var(--mu)}
+input,select,textarea{display:block;width:100%;min-height:48px;font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:11px 12px;-webkit-appearance:none;appearance:none}
+select{padding-right:40px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+select:has(option[value=""]:checked){color:var(--mu)}
+option{color:var(--tx)}
+input,select{height:48px}
+textarea{min-height:96px;resize:vertical}
+input[type=date],input[type=time]{text-align:left}
+::-webkit-date-and-time-value{text-align:left}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--ac);outline-offset:1px;border-color:var(--ac)}
+.bad{border-color:var(--er)!important}
+button{display:block;width:100%;min-height:50px;font:inherit;font-weight:700;border:0;border-radius:10px;background:var(--ac);color:var(--on);cursor:pointer}
+button:hover{background:var(--ach)}button:disabled{opacity:.6;cursor:default}
+#msg{margin:0;padding:12px 14px;border-radius:10px;font-weight:600;font-size:15px}
+#msg:empty{display:none}
+#msg.ok{color:var(--ok);background:var(--okb)}#msg.er{color:var(--er);background:var(--erb)}
+@media (max-width:560px){.grid{grid-template-columns:1fr}.logo img{height:40px}}
+</style></head>
+<body><main>
+<header>
+  <div class="logo"><img alt="Fusion Markets" src="data:image/png;base64,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"></div>
+  <h1>Attendance Notice</h1>
+  <p class="sub">Tell your managers if you'll be late, absent, or leaving early.</p>
+</header>
+<form class="card" id="f" novalidate>
+  <div class="grid">
+    <div class="f"><label for="name">Your name</label><input id="name" autocomplete="name" required></div>
+    <div class="f"><label for="team">Team</label>
+      <select id="team" required><option value="">Select team</option><option>Client Success</option><option>KYC</option></select></div>
+    <div class="f"><label for="shift">Shift start time</label><select id="shift" required></select></div>
+    <div class="f"><label for="type">What's happening?</label>
+      <select id="type"><option>Running Late</option><option>Absent</option><option>Leaving Early</option><option>Other</option></select></div>
+    <div class="f"><label for="date">Date</label><input id="date" type="date" required></div>
+    <div class="f"><label for="time">Expected time <span class="opt">(optional)</span></label><input id="time" type="time"></div>
+    <div class="f full"><label for="why">Reason / notes <span class="opt">(optional)</span></label><textarea id="why"></textarea></div>
+    <div class="f full"><button id="send" type="submit">Send to managers</button></div>
+    <p id="msg" class="full" role="status" aria-live="polite"></p>
+  </div>
+</form>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, "0");
+const today = () => { const d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); };
+(() => {
+  const o = ['<option value="">Select start time</option>'];
+  for (let m = 0; m < 1440; m += 30) {
+    const h = Math.floor(m / 60), n = m % 60;
+    o.push("<option>" + (h % 12 || 12) + ":" + pad(n) + (h < 12 ? " AM" : " PM") + "</option>");
+  }
+  $("shift").innerHTML = o.join("");
+  $("date").value = today();
+})();
+document.querySelectorAll("input,select,textarea").forEach(el => el.addEventListener("input", () => el.classList.remove("bad")));
+const say = (t, c) => { $("msg").textContent = t; $("msg").className = "full " + (c || ""); };
+$("f").addEventListener("submit", async e => {
+  e.preventDefault();
+  const missing = ["name", "team", "shift", "date"].filter(id => !$(id).value.trim());
+  document.querySelectorAll(".bad").forEach(el => el.classList.remove("bad"));
+  if (missing.length) {
+    missing.forEach(id => $(id).classList.add("bad"));
+    $(missing[0]).focus();
+    return say("Please enter your name, team, shift start time and date.", "er");
+  }
+  const p = {
+    name: $("name").value.trim(), team: $("team").value.trim(), shift: $("shift").value,
+    type: $("type").value, date: $("date").value, time: $("time").value, reason: $("why").value.trim(),
+    submittedAt: new Date().toISOString()
+  };
+  const btn = $("send");
+  btn.disabled = true; btn.textContent = "Sending...";
+  try {
+    const response = await fetch("/api/notify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(p) });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(result.details || result.error || "Request failed");
     }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0f1115;
-        --card: #1a1d23;
-        --tx: #e8eaed;
-        --mu: #9aa1ab;
-        --ac: #6ea0ff;
-        --ach: #8db3ff;
-        --on: #0b1220;
-        --bd: #343942;
-        --ok: #4ade80;
-        --okb: #12261a;
-        --er: #f87171;
-        --erb: #2a1a1a;
-      }
-    }
-
-    * { box-sizing: border-box; }
-    html { -webkit-text-size-adjust: 100%; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--tx);
-      font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    }
-
-    main {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: max(20px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
-        max(32px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
-    }
-
-    header { margin-bottom: 20px; }
-    .logo {
-      display: inline-block;
-      background: #fff;
-      border: 1px solid var(--bd);
-      border-radius: 12px;
-      padding: 8px 12px;
-      margin-bottom: 16px;
-    }
-
-    .logo img { display: block; height: 44px; width: auto; }
-
-    h1 {
-      font-size: clamp(22px, 4.5vw, 28px);
-      line-height: 1.2;
-      margin: 0 0 6px;
-    }
-
-    .sub { color: var(--mu); margin: 0; }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--bd);
-      border-radius: 16px;
-      padding: clamp(16px, 4vw, 28px);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px 16px;
-    }
-
-    .f { min-width: 0; }
-    .full { grid-column: 1 / -1; }
-
-    label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      margin: 0 0 6px;
-    }
-
-    .opt { font-weight: 400; color: var(--mu); }
-
-    input, select, textarea {
-      display: block;
-      width: 100%;
-      min-height: 48px;
-      font: inherit;
-      color: var(--tx);
-      background: var(--bg);
-      border: 1px solid var(--bd);
-      border-radius: 10px;
-      padding: 11px 12px;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-
-    select {
-      padding-right: 40px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      background-size: 12px 8px;
-    }
-
-    select:has(option[value=""]:checked) { color: var(--mu); }
-    option { color: var(--tx); }
-
-    input, select { height: 48px; }
-    textarea {
-      min-height: 96px;
-      resize: vertical;
-    }
-
-    input[type="date"], input[type="time"] { text-align: left; }
-    ::-webkit-date-and-time-value { text-align: left; }
-
-    input:focus, select:focus, textarea:focus {
-      outline: 2px solid var(--ac);
-      outline-offset: 1px;
-      border-color: var(--ac);
-    }
-
-    .bad { border-color: var(--er) !important; }
-
-    button {
-      display: block;
-      width: 100%;
-      min-height: 50px;
-      font: inherit;
-      font-weight: 700;
-      border: 0;
-      border-radius: 10px;
-      background: var(--ac);
-      color: var(--on);
-      cursor: pointer;
-    }
-
-    button:hover { background: var(--ach); }
-    button:disabled {
-      opacity: 0.6;
-      cursor: default;
-    }
-
-    #msg {
-      margin: 0;
-      padding: 12px 14px;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 15px;
-    }
-
-    #msg:empty { display: none; }
-    #msg.ok { color: var(--ok); background: var(--okb); }
-    #msg.er { color: var(--er); background: var(--erb); }
-
-    @media (max-width: 560px) {
-      .grid { grid-template-columns: 1fr; }
-      .logo img { height: 40px; }
-    }
-  </style>
-</head>
-<body>
-  <main>
-    <header>
-      <div class="logo">
-        <img alt="Fusion Markets" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI4AAAA/CAYAAAA2a/DYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAApLSURBVHh..." />
-      </div>
-      <h1>Attendance Notice</h1>
-      <p class="sub">Tell your managers if you'll be late, absent, or leaving early.</p>
-    </header>
-
-    <form class="card" id="f" novalidate>
-      <div class="grid">
-        <div class="f">
-          <label for="name">Your name</label>
-          <input id="name" autocomplete="name" required>
-        </div>
-
-        <div class="f">
-          <label for="team">Team</label>
-          <select id="team" required>
-            <option value="">Select team</option>
-            <option>Client Success</option>
-            <option>KYC</option>
-          </select>
-        </div>
-
-        <div class="f">
-          <label for="shift">Shift start time</label>
-          <select id="shift" required></select>
-        </div>
-
-        <div class="f">
-          <label for="type">What's happening?</label>
-          <select id="type">
-            <option>Running Late</option>
-            <option>Absent</option>
-            <option>Leaving Early</option>
-            <option>Other</option>
-          </select>
-        </div>
-
-        <div class="f">
-          <label for="date">Date</label>
-          <input id="date" type="date" required>
-        </div>
-
-        <div class="f">
-          <label for="time">Expected time <span class="opt">(optional)</span></label>
-          <input id="time" type="time">
-        </div>
-
-        <div class="f full">
-          <label for="why">Reason / notes <span class="opt">(optional)</span></label>
-          <textarea id="why"></textarea>
-        </div>
-
-        <div class="f full">
-          <button id="send" type="submit">Send to managers</button>
-        </div>
-
-        <p id="msg" class="full" role="status" aria-live="polite"></p>
-      </div>
-    </form>
-  </main>
-
-  <script>
-    const $ = id => document.getElementById(id);
-    const pad = n => String(n).padStart(2, "0");
-    const today = () => {
-      const d = new Date();
-      return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
-    };
-
-    (() => {
-      const options = ['<option value="">Select start time</option>'];
-      for (let minutes = 0; minutes < 1440; minutes += 30) {
-        const hour = Math.floor(minutes / 60);
-        const mins = minutes % 60;
-        const value = `${pad(hour)}:${pad(mins)}`;
-        const display = (hour % 12 || 12) + ":" + pad(mins) + (hour < 12 ? " AM" : " PM");
-        options.push(`<option value="${value}">${display}</option>`);
-      }
-      $("shift").innerHTML = options.join("");
-      $("date").value = today();
-    })();
-
-    document.querySelectorAll("input, select, textarea").forEach(el => {
-      el.addEventListener("input", () => el.classList.remove("bad"));
-    });
-
-    const say = (text, kind = "") => {
-      $("msg").textContent = text;
-      $("msg").className = "full " + (kind || "");
-    };
-
-    $("f").addEventListener("submit", async e => {
-      e.preventDefault();
-
-      const missing = ["name", "team", "shift", "date"].filter(id => !$(id).value.trim());
-
-      document.querySelectorAll(".bad").forEach(el => el.classList.remove("bad"));
-
-      if (missing.length) {
-        missing.forEach(id => $(id).classList.add("bad"));
-        $(missing[0]).focus();
-        return say("Please enter your name, team, shift start time and date.", "er");
-      }
-
-      const payload = {
-        name: $("name").value.trim(),
-        team: $("team").value.trim(),
-        shift: $("shift").value,
-        type: $("type").value,
-        date: $("date").value,
-        time: $("time").value,
-        reason: $("why").value.trim(),
-        submittedAt: new Date().toISOString()
-      };
-
-      const btn = $("send");
-      btn.disabled = true;
-      btn.textContent = "Sending...";
-
-      try {
-        const response = await fetch("/api/notify", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-          throw new Error(result.details || result.error || "Request failed");
-        }
-
-        say("Sent. Your managers have been notified.", "ok");
-        $("why").value = "";
-        $("time").value = "";
-      } catch (err) {
-        say("Couldn't send. Check your connection and try again.", "er");
-      } finally {
-        setTimeout(() => {
-          btn.disabled = false;
-          btn.textContent = "Send to managers";
-        }, 3000);
-      }
-    });
-  </script>
-</body>
-</html>
+    say("Sent. Your managers have been notified.", "ok");
+    $("why").value = ""; $("time").value = "";
+    $("name").value = ""; $("team").value = ""; $("type").value = "Running Late"; $("shift").value = ""; $("date").value = today();
+  } catch (err) {
+    say("Couldn't send. Check your connection and try again.", "er");
+  }
+  setTimeout(() => { btn.disabled = false; btn.textContent = "Send to managers"; }, 3000);
+});
+</script>
