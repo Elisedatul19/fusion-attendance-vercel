@@ -25,59 +25,53 @@ export default async function handler(request, response) {
     submittedAt
   } = payload;
 
-  const teamsWebhook = process.env.TEAMS_WEBHOOK_URL;
+  const powerAutomateWebhook = process.env.TEAMS_WEBHOOK_URL;
 
-  if (!teamsWebhook) {
+  if (!powerAutomateWebhook) {
     return response.status(500).json({
       error: "TEAMS_WEBHOOK_URL is not configured"
     });
   }
 
-  const teamsMessage = {
-    "@type": "MessageCard",
-    "@context": "http://schema.org/extensions",
-    summary: `Attendance notification for ${name}`,
-    themeColor: "7C3AED",
-    title: "Attendance Notice Submitted",
-    text: [
-      `Employee: ${name}`,
-      `Team: ${team}`,
-      `Status: ${type}`,
-      `Shift: ${shift}`,
-      `Date: ${date}`,
-      `Expected Time: ${time || "Not provided"}`,
-      `Reason: ${reason || "No notes"}`,
-      `Submitted: ${submittedAt}`
-    ].join("\n")
+  const powerAutomateMessage = {
+    name,
+    team,
+    shift,
+    type,
+    date,
+    time: time || "Not provided",
+    reason: reason || "No notes",
+    submittedAt
   };
 
   try {
-    const result = await fetch(teamsWebhook, {
+    const result = await fetch(powerAutomateWebhook, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(teamsMessage)
+      body: JSON.stringify(powerAutomateMessage)
     });
 
     const text = await result.text();
 
     if (!result.ok) {
-      return response.status(400).json({
-        error: "Teams rejected the webhook request",
-        details: text
+      return response.status(result.status).json({
+        error: "Power Automate rejected the webhook request",
+        details: text,
+        status: result.status
       });
     }
 
     return response.status(200).json({
       success: true,
-      message: "Notification Sent to Teams"
+      message: "Notification Sent to Power Automate"
     });
 
   } catch (error) {
     return response.status(500).json({
       success: false,
-      error: "Failed to send Teams notification",
+      error: "Failed to send to Power Automate",
       details: error.message
     });
   }
