@@ -6,7 +6,7 @@ export async function POST(request) {
     return Response.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { name, team, shift, type, date, time, reason, submittedAt } = body;
+  const { name, team, shift, type, date, time, reason } = body;
 
   if (!name || !team || !shift || !type || !date) {
     return Response.json({ error: "Missing required fields" }, { status: 400 });
@@ -16,31 +16,52 @@ export async function POST(request) {
     return Response.json({ error: "TEAMS_FLOW_URL not set" }, { status: 500 });
   }
 
+  const card = {
+    type: "message",
+    attachments: [
+      {
+        contentType: "application/vnd.microsoft.card.adaptive",
+        contentUrl: null,
+        content: {
+          $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
+          type: "AdaptiveCard",
+          version: "1.4",
+          body: [
+            { type: "TextBlock", text: "Attendance Notice", weight: "Bolder", size: "Large" },
+            {
+              type: "FactSet",
+              facts: [
+                { title: "Name", value: name },
+                { title: "Team", value: team },
+                { title: "Shift start", value: shift },
+                { title: "Status", value: type },
+                { title: "Date", value: date },
+                { title: "Expected time", value: time || "-" },
+                { title: "Reason", value: reason || "-" },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  };
+
   try {
     const r = await fetch(process.env.TEAMS_FLOW_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name,
-        team,
-        shift,
-        type,
-        date,
-        time: time || "",
-        reason: reason || "",
-        submittedAt: submittedAt || new Date().toISOString(),
-      }),
+      body: JSON.stringify(card),
     });
 
-        if (!r.ok) {
+    if (!r.ok) {
       const text = await r.text();
       return Response.json(
-        { error: "Flow rejected request", status: r.status, details: text.slice(0, 500) },
+        { error: "Webhook rejected request", status: r.status, details: text.slice(0, 500) },
         { status: 502 }
       );
     }
     return Response.json({ ok: true });
   } catch (e) {
-    return Response.json({ error: "Failed to reach flow" }, { status: 500 });
+    return Response.json({ error: "Failed to reach webhook" }, { status: 500 });
   }
 }
