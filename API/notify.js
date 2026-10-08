@@ -1,19 +1,16 @@
-export async function POST(request) {
-  let body;
-  try {
-    body = await request.json();
-  } catch (e) {
-    return Response.json({ error: "Invalid JSON body" }, { status: 400 });
+module.exports = async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { name, team, shift, type, date, time, reason, submittedAt } = body;
+  const { name, team, shift, type, date, time, reason, submittedAt } = req.body || {};
 
   if (!name || !team || !shift || !type || !date) {
-    return Response.json({ error: "Missing required fields" }, { status: 400 });
+    return res.status(400).json({ error: "Missing required fields" });
   }
 
   if (!process.env.TEAMS_FLOW_URL) {
-    return Response.json({ error: "TEAMS_FLOW_URL not set" }, { status: 500 });
+    return res.status(500).json({ error: "TEAMS_FLOW_URL not set" });
   }
 
   try {
@@ -21,11 +18,7 @@ export async function POST(request) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name,
-        team,
-        shift,
-        type,
-        date,
+        name, team, shift, type, date,
         time: time || "",
         reason: reason || "",
         submittedAt: submittedAt || new Date().toISOString(),
@@ -33,10 +26,10 @@ export async function POST(request) {
     });
 
     if (!r.ok) {
-      return Response.json({ error: "Flow rejected request", status: r.status }, { status: 502 });
+      return res.status(502).json({ error: "Flow rejected request", status: r.status });
     }
-    return Response.json({ ok: true });
+    return res.status(200).json({ ok: true });
   } catch (e) {
-    return Response.json({ error: "Failed to reach flow" }, { status: 500 });
+    return res.status(500).json({ error: "Failed to reach flow" });
   }
-}
+};
