@@ -1,78 +1,40 @@
-export default async function handler(request, response) {
-  if (request.method !== "POST") {
-    return response.status(405).json({ error: "Method not allowed" });
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
-  let payload;
+  const { name, team, shift, type, date, time, reason, submittedAt } = req.body || {};
+
+  // Only these are required; time and reason are optional
+  if (!name || !team || !shift || !type || !date) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  if (!process.env.TEAMS_FLOW_URL) {
+    return res.status(500).json({ error: "TEAMS_FLOW_URL not set" });
+  }
 
   try {
-    payload = await request.json();
-  } catch (error) {
-    return response.status(400).json({
-      error: "Invalid JSON body",
-      details: error.message
-    });
-  }
-
-  const {
-    name,
-    team,
-    shift,
-    type,
-    date,
-    time,
-    reason,
-    submittedAt
-  } = payload;
-
-  const powerAutomateWebhook = process.env.TEAMS_WEBHOOK_URL;
-
-  if (!powerAutomateWebhook) {
-    return response.status(500).json({
-      error: "TEAMS_WEBHOOK_URL is not configured"
-    });
-  }
-
-  const powerAutomateMessage = {
-    name,
-    team,
-    shift,
-    type,
-    date,
-    time: time || "Not provided",
-    reason: reason || "No notes",
-    submittedAt
-  };
-
-  try {
-    const result = await fetch(powerAutomateWebhook, {
+    const r = await fetch(process.env.TEAMS_FLOW_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(powerAutomateMessage)
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        team,
+        shift,
+        type,
+        date,
+        time: time || "",
+        reason: reason || "",
+        submittedAt: submittedAt || new Date().toISOString(),
+      }),
     });
 
-    const text = await result.text();
-
-    if (!result.ok) {
-      return response.status(result.status).json({
-        error: "Power Automate rejected the webhook request",
-        details: text,
-        status: result.status
-      });
+    if (!r.ok) {
+      return res.status(502).json({ error: "Flow rejected request", status: r.status });
     }
-
-    return response.status(200).json({
-      success: true,
-      message: "Notification Sent to Power Automate"
-    });
-
-  } catch (error) {
-    return response.status(500).json({
-      success: false,
-      error: "Failed to send to Power Automate",
-      details: error.message
-    });
+    return res.status(200).json({ ok: true });
+  } catch (e) {
+    return res.status(500).json({ error: "Failed to reach flow" });
   }
 }
