@@ -32,8 +32,12 @@ export async function POST(request) {
       }),
     });
 
-    if (!r.ok) {
-      return Response.json({ error: "Flow rejected request", status: r.status }, { status: 502 });
+        if (!r.ok) {
+      const text = await r.text();
+      return Response.json(
+        { error: "Flow rejected request", status: r.status, details: text.slice(0, 500) },
+        { status: 502 }
+      );
     }
     return Response.json({ ok: true });
   } catch (e) {
