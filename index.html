@@ -133,19 +133,24 @@ const showSug = () => {
     const li = document.createElement("li");
     li.textContent = n;
     li.setAttribute("role", "option");
-    li.addEventListener("pointerdown", ev => {
-      ev.preventDefault();
+    li.addEventListener("click", () => {
       nameEl.value = n;
       sug.hidden = true;
       nameEl.classList.remove("bad");
+      nameEl.blur();
     });
     sug.appendChild(li);
   });
   sug.hidden = list.length === 0;
 };
 nameEl.addEventListener("input", showSug);
-nameEl.addEventListener("focus", showSug);
-nameEl.addEventListener("blur", () => setTimeout(() => { sug.hidden = true; }, 150));
+nameEl.addEventListener("focus", () => {
+  showSug();
+  setTimeout(() => nameEl.scrollIntoView({ block: "start", behavior: "smooth" }), 250);
+});
+document.addEventListener("pointerdown", ev => {
+  if (!ev.target.closest(".ac")) sug.hidden = true;
+});
 (() => {
   const o = ['<option value="">Select start time</option>'];
   for (let m = 0; m < 1440; m += 30) {
