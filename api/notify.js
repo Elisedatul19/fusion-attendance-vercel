@@ -41,12 +41,6 @@ export async function POST(request) {
                 { title: "Notice", value: lateNotice ? "⚠ Late absence notice (under 4 hours before shift)" : "On time" },
               ],
             },
-            {
-              type: "TextBlock",
-              text: "A manager will reach out to the employee to confirm this notification.",
-              wrap: true,
-              isSubtle: true,
-            },
           ],
         },
       },
