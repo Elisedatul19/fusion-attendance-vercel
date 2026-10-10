@@ -45,7 +45,7 @@ button:hover{background:var(--ach)}button:disabled{opacity:.6;cursor:default}
 </header>
 <form class="card" id="f" novalidate>
   <div class="grid">
-    <div class="f"><label for="name">Your name</label><input id="name" list="agents" autocomplete="off" placeholder="Start typing your name" required><datalist id="agents"></datalist></div>
+    <div class="f ac"><label for="name">Your name</label><input id="name" autocomplete="off" placeholder="Start typing your name" required><ul id="sug" role="listbox" hidden></ul></div>
     <div class="f"><label for="team">Team</label>
       <select id="team" required><option value="">Select team</option><option>Client Success</option><option>KYC</option></select></div>
     <div class="f"><label for="shift">Shift start time</label><select id="shift" required></select></div>
