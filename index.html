@@ -45,7 +45,7 @@ button:hover{background:var(--ach)}button:disabled{opacity:.6;cursor:default}
 </header>
 <form class="card" id="f" novalidate>
   <div class="grid">
-    <div class="f"><label for="name">Your name</label><input id="name" autocomplete="name" required></div>
+    <div class="f"><label for="name">Your name</label><input id="name" list="agents" autocomplete="off" placeholder="Start typing your name" required><datalist id="agents"></datalist></div>
     <div class="f"><label for="team">Team</label>
       <select id="team" required><option value="">Select team</option><option>Client Success</option><option>KYC</option></select></div>
     <div class="f"><label for="shift">Shift start time</label><select id="shift" required></select></div>
@@ -71,6 +71,54 @@ const hoursUntilShift = (dateStr, shiftStr) => {
   const [y, mo, d] = dateStr.split("-").map(Number);
   return (new Date(y, mo - 1, d, h, parseInt(m[2], 10)) - new Date()) / 36e5;
 };
+const AGENTS = [
+  "Aaron Vigilla",
+  "Abigael Callos",
+  "Aimee Hicana",
+  "Alain Sebastian",
+  "Allen Obias",
+  "Andreas Schmidt",
+  "Angelica Labajo",
+  "Angeline Amamio",
+  "Blesilda Lutchavez",
+  "Brian Caramonte",
+  "Carlos Dimailig",
+  "Cecille Verano",
+  "Charina Silva",
+  "Charmea Cruz",
+  "Danilo Tabontabon",
+  "Earl Insierto",
+  "Evangeline De Ocampo",
+  "Ferlene Rafael",
+  "Jay-Ann Oteros",
+  "JD Tentoco",
+  "Jenieme Antong",
+  "Jessamae Candongo",
+  "Jessica Solneo",
+  "Jonnel Ulit",
+  "Katrina Carungui",
+  "Kiesha Pastrana",
+  "Lailani Palle",
+  "Lemuel Yu",
+  "Lorenzo Bayana",
+  "Maria Lopez",
+  "Mark Jabez Ninonuevo",
+  "Michelle Anne Barcelona",
+  "Neil Yatco",
+  "Nicole Diaz",
+  "Patricia Cruz",
+  "Precious Armee Mercado",
+  "Rachel Ann Dadivas",
+  "Rachelle Singh",
+  "Riana Nakamoto",
+  "Rosanie Andal",
+  "Ryan Cenzon",
+  "Tracy Dre Torres",
+  "Yuri Bulahan",
+  "Yvonne Tang",
+  "Zan Juanes"
+];
+$("agents").innerHTML = [...AGENTS].sort((a, b) => a.localeCompare(b)).map(n => '<option value="' + n + '"></option>').join("");
 (() => {
   const o = ['<option value="">Select start time</option>'];
   for (let m = 0; m < 1440; m += 30) {
@@ -91,8 +139,15 @@ $("f").addEventListener("submit", async e => {
     $(missing[0]).focus();
     return say("Please enter your name, team, shift start time and date.", "er");
   }
+  const typed = $("name").value.trim().toLowerCase();
+  const match = AGENTS.find(a => a.toLowerCase() === typed);
+  if (!match) {
+    $("name").classList.add("bad");
+    $("name").focus();
+    return say("Please pick your name from the list.", "er");
+  }
   const p = {
-    name: $("name").value.trim(), team: $("team").value.trim(), shift: $("shift").value,
+    name: match, team: $("team").value.trim(), shift: $("shift").value,
     type: $("type").value, date: $("date").value, time: $("time").value, reason: $("why").value.trim(),
     submittedAt: new Date().toISOString()
   };
