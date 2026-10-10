@@ -6,7 +6,7 @@ export async function POST(request) {
     return Response.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { name, team, shift, type, date, time, reason } = body;
+  const { name, team, shift, type, date, time, reason, lateNotice } = body;
 
   if (!name || !team || !shift || !type || !date) {
     return Response.json({ error: "Missing required fields" }, { status: 400 });
@@ -38,7 +38,14 @@ export async function POST(request) {
                 { title: "Date", value: date },
                 { title: "Expected time", value: time || "-" },
                 { title: "Reason", value: reason || "-" },
+                { title: "Notice", value: lateNotice ? "⚠ Late absence notice (under 4 hours before shift)" : "On time" },
               ],
+            },
+            {
+              type: "TextBlock",
+              text: "A manager will reach out to the employee to confirm this notification.",
+              wrap: true,
+              isSubtle: true,
             },
           ],
         },
