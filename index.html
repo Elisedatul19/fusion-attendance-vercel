@@ -36,7 +36,7 @@ button:hover{background:var(--ach)}button:disabled{opacity:.6;cursor:default}
 #msg:empty{display:none}
 #msg.ok{color:var(--ok);background:var(--okb)}#msg.er{color:var(--er);background:var(--erb)}
 .ac{position:relative}
-#sug{position:absolute;left:0;right:0;top:100%;margin:4px 0 0;padding:4px;list-style:none;max-height:220px;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--card);border:1px solid var(--bd);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:10}
+#sug{position:absolute;left:0;right:0;top:100%;margin:4px 0 0;padding:4px;list-style:none;max-height:240px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;background:var(--card);border:1px solid var(--bd);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:10}
 #sug[hidden]{display:none}
 #sug li{padding:12px;border-radius:8px;cursor:pointer}
 #sug li:hover{background:var(--bg)}
