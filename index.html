@@ -63,8 +63,8 @@ button:hover{background:var(--ach)}button:disabled{opacity:.6;cursor:default}
 const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2, "0");
 const today = () => { const d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); };
-  const hoursUntilShift = (dateStr, shiftStr) => {
-  const m = shiftStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+const hoursUntilShift = (dateStr, shiftStr) => {
+  const m = (shiftStr || "").match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
   if (!m || !dateStr) return null;
   let h = parseInt(m[1], 10) % 12;
   if (m[3].toUpperCase() === "PM") h += 12;
@@ -95,10 +95,10 @@ $("f").addEventListener("submit", async e => {
     name: $("name").value.trim(), team: $("team").value.trim(), shift: $("shift").value,
     type: $("type").value, date: $("date").value, time: $("time").value, reason: $("why").value.trim(),
     submittedAt: new Date().toISOString()
-      const hrs = hoursUntilShift(p.date, p.shift);
+  };
+  const hrs = hoursUntilShift(p.date, p.shift);
   const lateAbsence = p.type === "Absent" && hrs !== null && hrs < 4;
   p.lateNotice = lateAbsence;
-  };
   const btn = $("send");
   btn.disabled = true; btn.textContent = "Sending...";
   try {
@@ -107,9 +107,9 @@ $("f").addEventListener("submit", async e => {
     if (!response.ok) {
       throw new Error(result.details || result.error || "Request failed");
     }
-        const confirmMsg = "Sent. Your managers have been notified, and a manager will reach out to you to confirm this notification.";
+    const confirmMsg = "Sent. Your managers have been notified, and a manager will reach out to you to confirm this notification.";
     if (lateAbsence) {
-      say("⚠ Warning: you submitted this absence less than 4 hours before your shift start. [your policy wording here] " + confirmMsg, "er");
+      say("Warning: you submitted this absence less than 4 hours before your shift start. " + confirmMsg, "er");
     } else {
       say(confirmMsg, "ok");
     }
