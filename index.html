@@ -123,7 +123,29 @@ const AGENTS = [
   "Yvonne Tang",
   "Zan Juanes"
 ];
-$("agents").innerHTML = [...AGENTS].sort((a, b) => a.localeCompare(b)).map(n => '<option value="' + n + '"></option>').join("");
+const sug = $("sug"), nameEl = $("name");
+const SORTED = [...AGENTS].sort((a, b) => a.localeCompare(b));
+const showSug = () => {
+  const q = nameEl.value.trim().toLowerCase();
+  const list = SORTED.filter(n => n.toLowerCase().includes(q));
+  sug.innerHTML = "";
+  list.forEach(n => {
+    const li = document.createElement("li");
+    li.textContent = n;
+    li.setAttribute("role", "option");
+    li.addEventListener("pointerdown", ev => {
+      ev.preventDefault();
+      nameEl.value = n;
+      sug.hidden = true;
+      nameEl.classList.remove("bad");
+    });
+    sug.appendChild(li);
+  });
+  sug.hidden = list.length === 0;
+};
+nameEl.addEventListener("input", showSug);
+nameEl.addEventListener("focus", showSug);
+nameEl.addEventListener("blur", () => setTimeout(() => { sug.hidden = true; }, 150));
 (() => {
   const o = ['<option value="">Select start time</option>'];
   for (let m = 0; m < 1440; m += 30) {
