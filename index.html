@@ -40,6 +40,7 @@ button:hover{background:var(--ach)}button:disabled{opacity:.6;cursor:default}
 #sug[hidden]{display:none}
 #sug li{padding:12px;border-radius:8px;cursor:pointer}
 #sug li:hover{background:var(--bg)}
+select:disabled{opacity:.8;cursor:default}
 @media (max-width:560px){.grid{grid-template-columns:1fr}.logo img{height:40px}}
 </style></head>
 <body><main>
@@ -68,73 +69,71 @@ button:hover{background:var(--ach)}button:disabled{opacity:.6;cursor:default}
 const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2, "0");
 const today = () => { const d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); };
-const hoursUntilShift = (dateStr, shiftStr) => {
-  const m = (shiftStr || "").match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-  if (!m || !dateStr) return null;
-  let h = parseInt(m[1], 10) % 12;
-  if (m[3].toUpperCase() === "PM") h += 12;
-  const [y, mo, d] = dateStr.split("-").map(Number);
-  return (new Date(y, mo - 1, d, h, parseInt(m[2], 10)) - new Date()) / 36e5;
-};
+const CS = "Client Success", KYC = "KYC";
 const AGENTS = [
-  "Aaron Vigilla",
-  "Abigael Callos",
-  "Aimee Hicana",
-  "Alain Sebastian",
-  "Allen Obias",
-  "Andreas Schmidt",
-  "Angelica Labajo",
-  "Angeline Amamio",
-  "Blesilda Lutchavez",
-  "Brian Caramonte",
-  "Carlos Dimailig",
-  "Cecille Verano",
-  "Charina Silva",
-  "Charmea Cruz",
-  "Danilo Tabontabon",
-  "Earl Insierto",
-  "Evangeline De Ocampo",
-  "Ferlene Rafael",
-  "Jay-Ann Oteros",
-  "JD Tentoco",
-  "Jenieme Antong",
-  "Jessamae Candongo",
-  "Jessica Solneo",
-  "Jonnel Ulit",
-  "Katrina Carungui",
-  "Kiesha Pastrana",
-  "Lailani Palle",
-  "Lemuel Yu",
-  "Lorenzo Bayana",
-  "Maria Lopez",
-  "Mark Jabez Ninonuevo",
-  "Michelle Anne Barcelona",
-  "Neil Yatco",
-  "Nicole Diaz",
-  "Patricia Cruz",
-  "Precious Armee Mercado",
-  "Rachel Ann Dadivas",
-  "Rachelle Singh",
-  "Riana Nakamoto",
-  "Rosanie Andal",
-  "Ryan Cenzon",
-  "Tracy Dre Torres",
-  "Yuri Bulahan",
-  "Yvonne Tang",
-  "Zan Juanes"
+  ["Aaron Vigilla", CS],
+  ["Abigael Callos", KYC],
+  ["Aimee Hicana", KYC],
+  ["Alain Sebastian", KYC],
+  ["Allen Obias", CS],
+  ["Andreas Schmidt", CS],
+  ["Angelica Labajo", CS],
+  ["Blesilda Lutchavez", CS],
+  ["Brian Caramonte", CS],
+  ["Carlos Dimailig", CS],
+  ["Cecille Verano", CS],
+  ["Charina Silva", CS],
+  ["Charmea Cruz", CS],
+  ["Danilo Tabontabon", CS],
+  ["Earl Insierto", KYC],
+  ["Evangeline De Ocampo", KYC],
+  ["Ferlene Rafael", CS],
+  ["Hans Nicole Diaz", KYC],
+  ["Jay-Ann Oteros", KYC],
+  ["Juan Diego Tentoco", CS],
+  ["Jenieme Antong", KYC],
+  ["Jessamae Candongo", KYC],
+  ["Jessica Solneo", CS],
+  ["Jonnel Ulit", CS],
+  ["Katrina Carungui", KYC],
+  ["Kiesha Pastrana", CS],
+  ["Lailani Palle", KYC],
+  ["Lemuel Yu", CS],
+  ["Lorenzo Bayana", CS],
+  ["Maria Patrisha Lopez", KYC],
+  ["Mark Jabez Ninonuevo", CS],
+  ["Michelle Anne Barcelona", KYC],
+  ["Neil Yatco", CS],
+  ["Patricia Marie Cruz", KYC],
+  ["Precious Armee Mercado", CS],
+  ["Rachel Ann Dadivas", CS],
+  ["Rachelle Singh", CS],
+  ["Riana Nakamoto", CS],
+  ["Rosanie Andal", CS],
+  ["Rose Angeline Amamio", KYC],
+  ["Ryan Cenzon", CS],
+  ["Tracy Dre Torres", CS],
+  ["Yuri Mae Bulahan", KYC],
+  ["Yvonne Tang", KYC],
+  ["Zan Juanes", CS]
 ];
-const sug = $("sug"), nameEl = $("name");
-const SORTED = [...AGENTS].sort((a, b) => a.localeCompare(b));
+const SORTED = [...AGENTS].sort((a, b) => a[0].localeCompare(b[0]));
+const sug = $("sug"), nameEl = $("name"), teamEl = $("team");
+teamEl.options[0].textContent = "Auto-filled from your name";
+teamEl.disabled = true;
+const teamFor = v => { const a = AGENTS.find(x => x[0].toLowerCase() === v.trim().toLowerCase()); return a ? a[1] : ""; };
+const syncTeam = () => { teamEl.value = teamFor(nameEl.value); };
 const showSug = () => {
   const q = nameEl.value.trim().toLowerCase();
-  const list = SORTED.filter(n => n.toLowerCase().includes(q));
+  const list = SORTED.filter(a => a[0].toLowerCase().includes(q));
   sug.innerHTML = "";
-  list.forEach(n => {
+  list.forEach(a => {
     const li = document.createElement("li");
-    li.textContent = n;
+    li.textContent = a[0];
     li.setAttribute("role", "option");
     li.addEventListener("click", () => {
-      nameEl.value = n;
+      nameEl.value = a[0];
+      syncTeam();
       sug.hidden = true;
       nameEl.classList.remove("bad");
       nameEl.blur();
@@ -143,7 +142,7 @@ const showSug = () => {
   });
   sug.hidden = list.length === 0;
 };
-nameEl.addEventListener("input", showSug);
+nameEl.addEventListener("input", () => { showSug(); syncTeam(); });
 nameEl.addEventListener("focus", () => {
   showSug();
   setTimeout(() => nameEl.scrollIntoView({ block: "start", behavior: "smooth" }), 250);
@@ -164,28 +163,25 @@ document.querySelectorAll("input,select,textarea").forEach(el => el.addEventList
 const say = (t, c) => { $("msg").textContent = t; $("msg").className = "full " + (c || ""); };
 $("f").addEventListener("submit", async e => {
   e.preventDefault();
-  const missing = ["name", "team", "shift", "date"].filter(id => !$(id).value.trim());
+  const missing = ["name", "shift", "date"].filter(id => !$(id).value.trim());
   document.querySelectorAll(".bad").forEach(el => el.classList.remove("bad"));
   if (missing.length) {
     missing.forEach(id => $(id).classList.add("bad"));
     $(missing[0]).focus();
-    return say("Please enter your name, team, shift start time and date.", "er");
+    return say("Please enter your name, shift start time and date.", "er");
   }
-  const typed = $("name").value.trim().toLowerCase();
-  const match = AGENTS.find(a => a.toLowerCase() === typed);
+  const typed = nameEl.value.trim().toLowerCase();
+  const match = AGENTS.find(a => a[0].toLowerCase() === typed);
   if (!match) {
-    $("name").classList.add("bad");
-    $("name").focus();
+    nameEl.classList.add("bad");
+    nameEl.focus();
     return say("Please pick your name from the list.", "er");
   }
   const p = {
-    name: match, team: $("team").value.trim(), shift: $("shift").value,
+    name: match[0], team: match[1], shift: $("shift").value,
     type: $("type").value, date: $("date").value, time: $("time").value, reason: $("why").value.trim(),
     submittedAt: new Date().toISOString()
   };
-  const hrs = hoursUntilShift(p.date, p.shift);
-  const lateAbsence = p.type === "Absent" && hrs !== null && hrs < 4;
-  p.lateNotice = lateAbsence;
   const btn = $("send");
   btn.disabled = true; btn.textContent = "Sending...";
   try {
@@ -195,13 +191,13 @@ $("f").addEventListener("submit", async e => {
       throw new Error(result.details || result.error || "Request failed");
     }
     const confirmMsg = "Sent. Your managers have been notified, and a manager will reach out to you to confirm this notification.";
-    if (lateAbsence) {
+    if (result.lateNotice) {
       say("Warning: you submitted this absence less than 4 hours before your shift start. " + confirmMsg, "er");
     } else {
       say(confirmMsg, "ok");
     }
     $("why").value = ""; $("time").value = "";
-    $("name").value = ""; $("team").value = ""; $("type").value = "Running Late"; $("shift").value = ""; $("date").value = today();
+    nameEl.value = ""; syncTeam(); $("type").value = "Running Late"; $("shift").value = ""; $("date").value = today();
   } catch (err) {
     say("Couldn't send. Check your connection and try again.", "er");
   }
