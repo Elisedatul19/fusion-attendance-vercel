@@ -192,7 +192,7 @@ $("f").addEventListener("submit", async e => {
     }
     const confirmMsg = "Sent. Your managers have been notified, and a manager will reach out to you to confirm this notification.";
     if (result.lateNotice) {
-      say("Warning: you submitted this absence less than 4 hours before your shift start. " + confirmMsg, "er");
+      say("Warning: you submitted this notice less than 4 hours before your shift start. " + confirmMsg, "er");
     } else {
       say(confirmMsg, "ok");
     }
