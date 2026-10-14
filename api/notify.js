@@ -28,7 +28,7 @@ export async function POST(request) {
   }
 
   const hrs = hoursUntilShiftManila(date, shift);
-  const lateNotice = type === "Absent" && hrs !== null && hrs < 4;
+  const lateNotice = (type === "Absent" || type === "Half Day") && hrs !== null && hrs < 4;
 
   const card = {
     type: "message",
