@@ -53,7 +53,7 @@ select:disabled{opacity:.8;cursor:default}
   <div class="grid">
     <div class="f ac"><label for="name">Your name</label><input id="name" autocomplete="off" placeholder="Start typing your name" required><ul id="sug" role="listbox" hidden></ul></div>
     <div class="f"><label for="team">Team</label>
-      <select id="team" required><option value="">Select team</option><option>Client Success</option><option>KYC</option></select></div>
+      <select id="team" required><option value="">Select team</option><option>Client Success</option><option>KYC</option><option>Escalations</option></select></div>
     <div class="f"><label for="shift">Shift start time</label><select id="shift" required></select></div>
     <div class="f"><label for="type">What's happening?</label>
       <select id="type"><option>Running Late</option><option>Absent</option><option>Half Day</option><option>Leaving Early</option><option>Other</option></select></div>
@@ -69,7 +69,7 @@ select:disabled{opacity:.8;cursor:default}
 const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2, "0");
 const today = () => { const d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); };
-const CS = "Client Success", KYC = "KYC";
+const CS = "Client Success", KYC = "KYC", ESC = "Escalations";
 const AGENTS = [
   ["Aaron Vigilla", CS],
   ["Abigael Callos", KYC],
@@ -78,7 +78,7 @@ const AGENTS = [
   ["Allen Obias", CS],
   ["Andreas Schmidt", CS],
   ["Angelica Labajo", CS],
-  ["Blesilda Lutchavez", CS],
+  ["Blesilda Lutchavez", ESC],
   ["Brian Caramonte", CS],
   ["Carlos Dimailig", CS],
   ["Cecille Verano", CS],
@@ -106,7 +106,7 @@ const AGENTS = [
   ["Neil Yatco", CS],
   ["Patricia Marie Cruz", KYC],
   ["Precious Armee Mercado", CS],
-  ["Rachel Ann Dadivas", CS],
+  ["Rachel Ann Dadivas", ESC],
   ["Rachelle Singh", CS],
   ["Riana Nakamoto", CS],
   ["Rosanie Andal", CS],
