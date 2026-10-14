@@ -52,7 +52,7 @@ export async function POST(request) {
                 { title: "Date", value: date },
                 { title: "Expected time", value: time || "-" },
                 { title: "Reason", value: reason || "-" },
-                { title: "Notice", value: lateNotice ? "⚠ Late absence notice (under 4 hours before shift)" : "On time" },
+                { title: "Notice", value: lateNotice ? "⚠ Late notice (under 4 hours before shift)" : "On time" },
               ],
             },
           ],
