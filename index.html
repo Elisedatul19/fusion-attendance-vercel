@@ -170,8 +170,14 @@ const updateOffset = () => {
   const prev = offsetEl.value;
   offsetEl.innerHTML = '<option value="">Select offset date</option>';
   if (!on) return;
-  const dv = $("date").value;
-  if (!dv || !isWeekday(dv)) return;
+  let dv = $("date").value;
+  if (!dv) return;
+  if (!isWeekday(dv)) {
+    const d = parseD(dv);
+    d.setUTCDate(d.getUTCDate() + (8 - d.getUTCDay()) % 7);
+    dv = fmtD(d);
+    $("date").value = dv;
+  }
   const [mn, mx] = offsetRange(dv);
   const end = parseD(mx);
   const opts = [];
