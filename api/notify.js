@@ -1,3 +1,5 @@
+const ONSITE = "Unable to report onsite";
+
 const hoursUntilShiftManila = (dateStr, shiftStr) => {
   const m = String(shiftStr || "").match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
   const d = String(dateStr || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -9,6 +11,19 @@ const hoursUntilShiftManila = (dateStr, shiftStr) => {
   return (shiftUtc - Date.now()) / 36e5;
 };
 
+const parseD = s => {
+  const m = String(s || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m ? new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])) : null;
+};
+const pad = n => String(n).padStart(2, "0");
+const fmtD = dt => dt.getUTCFullYear() + "-" + pad(dt.getUTCMonth() + 1) + "-" + pad(dt.getUTCDate());
+const isWeekday = dt => { const w = dt.getUTCDay(); return w >= 1 && w <= 5; };
+const offsetRange = dt => {
+  const mon = new Date(dt); mon.setUTCDate(dt.getUTCDate() - ((dt.getUTCDay() + 6) % 7));
+  const fri = new Date(mon); fri.setUTCDate(mon.getUTCDate() + 11);
+  return [fmtD(mon), fmtD(fri)];
+};
+
 export async function POST(request) {
   let body;
   try {
@@ -17,10 +32,26 @@ export async function POST(request) {
     return Response.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { name, team, shift, type, date, time, reason } = body;
+  const { name, team, shift, type, date, time, reason, offsetDate } = body;
 
   if (!name || !team || !shift || !type || !date) {
     return Response.json({ error: "Missing required fields" }, { status: 400 });
+  }
+
+  const isOnsite = type === ONSITE;
+  if (isOnsite) {
+    const missed = parseD(date);
+    const offset = parseD(offsetDate);
+    if (!missed || !isWeekday(missed)) {
+      return Response.json({ error: "Onsite date must be a weekday" }, { status: 400 });
+    }
+    if (!offset) {
+      return Response.json({ error: "Onsite offset date is required" }, { status: 400 });
+    }
+    const [min, max] = offsetRange(missed);
+    if (offsetDate < min || offsetDate > max || !isWeekday(offset) || offsetDate === date) {
+      return Response.json({ error: "Offset date must be a weekday in the same week or the following week" }, { status: 400 });
+    }
   }
 
   if (!process.env.TEAMS_FLOW_URL) {
@@ -29,6 +60,18 @@ export async function POST(request) {
 
   const hrs = hoursUntilShiftManila(date, shift);
   const lateNotice = (type === "Absent" || type === "Half Day") && hrs !== null && hrs < 4;
+
+  const facts = [
+    { title: "Name", value: name },
+    { title: "Team", value: team },
+    { title: "Shift start", value: shift },
+    { title: "Status", value: type },
+    { title: "Date", value: date },
+    { title: "Expected time", value: time || "-" },
+    { title: "Reason", value: reason || "-" },
+    { title: "Notice", value: lateNotice ? "⚠ Late notice (under 4 hours before shift)" : (isOnsite ? "-" : "On time") },
+  ];
+  if (isOnsite) facts.push({ title: "Onsite offset date", value: offsetDate });
 
   const card = {
     type: "message",
@@ -42,19 +85,7 @@ export async function POST(request) {
           version: "1.4",
           body: [
             { type: "TextBlock", text: "Attendance Notice", weight: "Bolder", size: "Large" },
-            {
-              type: "FactSet",
-              facts: [
-                { title: "Name", value: name },
-                { title: "Team", value: team },
-                { title: "Shift start", value: shift },
-                { title: "Status", value: type },
-                { title: "Date", value: date },
-                { title: "Expected time", value: time || "-" },
-                { title: "Reason", value: reason || "-" },
-                { title: "Notice", value: lateNotice ? "⚠ Late notice (under 4 hours before shift)" : "On time" },
-              ],
-            },
+            { type: "FactSet", facts },
           ],
         },
       },
