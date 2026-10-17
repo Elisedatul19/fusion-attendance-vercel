@@ -60,7 +60,7 @@ select:disabled{opacity:.8;cursor:default}
       <select id="type"><option>Running Late</option><option>Absent</option><option>Half Day</option><option>Leaving Early</option><option>Unable to report onsite</option><option>Other</option></select></div>
     <div class="f"><label for="date">Date</label><input id="date" type="date" required></div>
     <div class="f"><label for="time">Expected time <span class="opt">(optional)</span></label><input id="time" type="time"></div>
-    <div class="f full" id="offsetWrap" hidden><label for="offset">Onsite offset date</label><input id="offset" type="date"><span class="hint">Pick a weekday in the same week as your missed onsite day, or the following week.</span></div>
+    <div class="f full" id="offsetWrap" hidden><label for="offset">Onsite offset date</label><select id="offset"><option value="">Select offset date</option></select><span class="hint">Choose a weekday in the same week as your missed onsite day, or the following week.</span></div>
     <div class="f full"><label for="why">Reason / notes <span class="opt"></span></label><textarea id="why"></textarea></div>
     <div class="f full"><button id="send" type="submit">Send to managers</button></div>
     <p id="msg" class="full" role="status" aria-live="polite"></p>
@@ -163,20 +163,24 @@ nameEl.addEventListener("focus", () => {
 document.addEventListener("pointerdown", ev => {
   if (!ev.target.closest(".ac")) sug.hidden = true;
 });
+const fmtLabel = s => parseD(s).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
 const updateOffset = () => {
   const on = $("type").value === ONSITE;
   offsetWrap.hidden = !on;
-  if (!on) {
-    offsetEl.value = "";
-    offsetEl.removeAttribute("min");
-    offsetEl.removeAttribute("max");
-    return;
-  }
+  const prev = offsetEl.value;
+  offsetEl.innerHTML = '<option value="">Select offset date</option>';
+  if (!on) return;
   const dv = $("date").value;
-  if (!dv) return;
+  if (!dv || !isWeekday(dv)) return;
   const [mn, mx] = offsetRange(dv);
-  offsetEl.min = mn; offsetEl.max = mx;
-  if (offsetEl.value && (offsetEl.value < mn || offsetEl.value > mx)) offsetEl.value = "";
+  const end = parseD(mx);
+  const opts = [];
+  for (let d = parseD(mn); d <= end; d.setUTCDate(d.getUTCDate() + 1)) {
+    const s = fmtD(d);
+    if (isWeekday(s) && s !== dv) opts.push('<option value="' + s + '">' + fmtLabel(s) + '</option>');
+  }
+  offsetEl.innerHTML += opts.join("");
+  if (prev && [...offsetEl.options].some(o => o.value === prev)) offsetEl.value = prev;
 };
 $("type").addEventListener("change", updateOffset);
 $("date").addEventListener("change", updateOffset);
