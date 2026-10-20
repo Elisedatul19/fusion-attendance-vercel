@@ -254,7 +254,7 @@ $("f").addEventListener("submit", async e => {
     if (!response.ok) {
       throw new Error(result.details || result.error || "Request failed");
     }
-    const confirmMsg = "Sent. Your managers have been notified, and a manager will reach out to you to confirm this notification.";
+    const confirmMsg = "Sent. Your managers have been notified, and a manager will reach out to you to confirm this notification.\nPlease keep your Teams line available so they can reach you.";
     if (result.lateNotice) {
       say("Warning: you submitted this notice less than 4 hours before your shift start. " + confirmMsg, "er");
     } else {
