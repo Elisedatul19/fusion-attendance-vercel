@@ -263,9 +263,11 @@ $("f").addEventListener("submit", async e => {
     $("why").value = ""; $("time").value = "";
     nameEl.value = ""; syncTeam(); $("type").value = "Running Late"; $("shift").value = ""; $("date").value = today();
     updateOffset();
+    btn.textContent = "Sent ✓";
+    setTimeout(() => { btn.disabled = false; btn.textContent = "Send to managers"; }, 5000);
   } catch (err) {
     say("Couldn't send. Check your connection and try again.", "er");
+    btn.disabled = false; btn.textContent = "Send to managers";
   }
-  setTimeout(() => { btn.disabled = false; btn.textContent = "Send to managers"; }, 3000);
 });
 </script>
