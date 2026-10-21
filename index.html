@@ -54,7 +54,7 @@ select:disabled{opacity:.8;cursor:default}
   <div class="grid">
     <div class="f ac"><label for="name">Your name</label><input id="name" autocomplete="off" placeholder="Start typing your name" required><ul id="sug" role="listbox" hidden></ul></div>
     <div class="f"><label for="team">Team</label>
-      <select id="team" required><option value="">Select team</option><option>Client Success</option><option>KYC</option><option>Escalations</option></select></div>
+      <select id="team" required><option value="">Select team</option><option>Client Success</option><option>KYC</option><option>Escalations</option><option>Funding</option></select></div>
     <div class="f"><label for="shift">Shift start time</label><select id="shift" required></select></div>
     <div class="f"><label for="type">What's happening?</label>
       <select id="type"><option>Running Late</option><option>Absent</option><option>Half Day</option><option>Leaving Early</option><option>Unable to report onsite</option><option>Other</option></select></div>
@@ -81,7 +81,7 @@ const offsetRange = s => {
   const fri = new Date(mon); fri.setUTCDate(mon.getUTCDate() + 11);
   return [fmtD(mon), fmtD(fri)];
 };
-const CS = "Client Success", KYC = "KYC", ESC = "Escalations";
+const CS = "Client Success", KYC = "KYC", ESC = "Escalations", FUND = "Funding";
 const AGENTS = [
   ["Aaron Vigilla", CS],
   ["Abigael Callos", KYC],
@@ -128,6 +128,35 @@ const AGENTS = [
   ["Yuri Mae Bulahan", KYC],
   ["Yvonne Tang", KYC],
   ["Zan Juanes", CS]
+  ["Allan Mangorangca", FUND],
+  ["Alyssa Anareta", FUND],
+  ["Ardel Delos Reyes", FUND],
+  ["Cheene Dapadap", FUND],
+  ["Chiara Palabrica", FUND],
+  ["Christian Baluyot", FUND],
+  ["Clemente Manabat", FUND],
+  ["Errol Mamisao", FUND],
+  ["Gracel Ayento", FUND],
+  ["Janell Aganan", FUND],
+  ["Jax Tan", FUND],
+  ["Jean Velasco", FUND],
+  ["Joyce Isidro", FUND],
+  ["Jules Atun", FUND],
+  ["Kirsten Maranan", FUND],
+  ["Kristalyn Anonuevo", FUND],
+  ["Kristine Israel", FUND],
+  ["Lemuel Morial", FUND],
+  ["Luisa Moreno", FUND],
+  ["Milagrose Gindap", FUND],
+  ["Pauline Lo", FUND],
+  ["Ria Bejasa", FUND],
+  ["Shaiddel Llamido", FUND],
+  ["Wendel Rivera", FUND],
+  ["Jovie Generillo", KYC],
+  ["Fern Hernandez", KYC],
+  ["Reina Lojo", KYC],
+  ["Angel Torela", CS],
+  ["Mishalgrace Torres", CS],
 ];
 const SORTED = [...AGENTS].sort((a, b) => a[0].localeCompare(b[0]));
 const sug = $("sug"), nameEl = $("name"), teamEl = $("team");
