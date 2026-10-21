@@ -67,6 +67,14 @@ select:disabled{opacity:.8;cursor:default}
   </div>
 </form>
 </main>
+<p id="ver" style="text-align:center;font-size:12px;color:#888;margin:0 0 16px">Page version 2026-10-22-b</p>
+<pre id="dbg" hidden style="white-space:pre-wrap;margin:0 16px 24px;padding:12px;border-radius:10px;background:#2a1517;color:#f87171;font-size:13px"></pre>
+<script>
+window.addEventListener("error", function (e) {
+  var d = document.getElementById("dbg");
+  if (d) { d.hidden = false; d.textContent += "Script error: " + e.message + " (line " + e.lineno + ")\n"; }
+});
+</script>
 <script>
 const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2, "0");
@@ -81,7 +89,6 @@ const offsetRange = s => {
   const fri = new Date(mon); fri.setUTCDate(mon.getUTCDate() + 11);
   return [fmtD(mon), fmtD(fri)];
 };
-const CS = "Client Success", KYC = "KYC", ESC = "Escalations", FUND = "Funding";
 const CS = "Client Success", KYC = "KYC", ESC = "Escalations", FUND = "Funding";
 const AGENTS = [
   ["Aaron Vigilla", CS],
@@ -285,7 +292,7 @@ $("f").addEventListener("submit", async e => {
     if (!response.ok) {
       throw new Error(result.details || result.error || "Request failed");
     }
-    const confirmMsg = "Sent. Your managers have been notified, and a manager will reach out to you to confirm this notification.\nPlease keep your Teams line available so they can reach you.";
+    const confirmMsg = "Sent. Your managers have been notified, and a manager will reach out to you to confirm this notification. Please keep your Teams line available so they can reach you.";
     if (result.lateNotice) {
       say("Warning: you submitted this notice less than 4 hours before your shift start. " + confirmMsg, "er");
     } else {
@@ -302,3 +309,4 @@ $("f").addEventListener("submit", async e => {
   }
 });
 </script>
+</body></html>
