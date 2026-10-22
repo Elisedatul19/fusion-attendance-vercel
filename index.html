@@ -67,13 +67,6 @@ select:disabled{opacity:.8;cursor:default}
   </div>
 </form>
 </main>
-<pre id="dbg" hidden style="white-space:pre-wrap;margin:0 16px 24px;padding:12px;border-radius:10px;background:#2a1517;color:#f87171;font-size:13px"></pre>
-<script>
-window.addEventListener("error", function (e) {
-  var d = document.getElementById("dbg");
-  if (d) { d.hidden = false; d.textContent += "Script error: " + e.message + " (line " + e.lineno + ")\n"; }
-});
-</script>
 <script>
 const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2, "0");
