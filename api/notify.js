@@ -6,6 +6,7 @@ const hoursUntilShiftManila = (dateStr, shiftStr) => {
   if (!m || !d) return null;
   let h = parseInt(m[1], 10) % 12;
   if (m[3].toUpperCase() === "PM") h += 12;
+  // Manila is UTC+8 with no daylight saving, so subtract 8 hours to get UTC
   const shiftUtc = Date.UTC(+d[1], +d[2] - 1, +d[3], h - 8, parseInt(m[2], 10));
   return (shiftUtc - Date.now()) / 36e5;
 };
@@ -21,15 +22,6 @@ const offsetRange = dt => {
   const mon = new Date(dt); mon.setUTCDate(dt.getUTCDate() - ((dt.getUTCDay() + 6) % 7));
   const fri = new Date(mon); fri.setUTCDate(mon.getUTCDate() + 11);
   return [fmtD(mon), fmtD(fri)];
-};
-
-const emailFor = name => {
-  try {
-    const map = JSON.parse(process.env.AGENT_EMAILS || "{}");
-    return map[name] || "";
-  } catch (e) {
-    return "";
-  }
 };
 
 export async function POST(request) {
@@ -81,13 +73,6 @@ export async function POST(request) {
   ];
   if (isOnsite) facts.push({ title: "Onsite offset date", value: offsetDate });
 
-  const cardBody = [
-    { type: "TextBlock", text: "Attendance Notice", weight: "Bolder", size: "Large" },
-    { type: "FactSet", facts },
-  ];
-  const email = emailFor(name);
-  if (email) cardBody.push({ type: "TextBlock", text: email, isVisible: false });
-
   const card = {
     type: "message",
     attachments: [
@@ -98,9 +83,9 @@ export async function POST(request) {
           $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
           type: "AdaptiveCard",
           version: "1.4",
-          body: cardBody,
-          actions: [
-            { type: "Action.Submit", title: isOnsite ? "Plotted" : "Confirmed", data: { action: "confirm" } },
+          body: [
+            { type: "TextBlock", text: "Attendance Notice", weight: "Bolder", size: "Large" },
+            { type: "FactSet", facts },
           ],
         },
       },
