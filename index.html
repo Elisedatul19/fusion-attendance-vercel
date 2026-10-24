@@ -57,11 +57,11 @@ select:disabled{opacity:.8;cursor:default}
       <select id="team" required><option value="">Select team</option><option>Client Success</option><option>KYC</option><option>Escalations</option><option>Funding</option></select></div>
     <div class="f"><label for="shift">Shift start time</label><select id="shift" required></select></div>
     <div class="f"><label for="type">What's happening?</label>
-      <select id="type"><option>Running Late</option><option>Absent</option><option>Half Day</option><option>Leaving Early</option><option>Unable to report onsite</option><option>Other</option></select></div>
+      <select id="type"><option>Running Late</option><option>Absent</option><option>Half Day</option><option>Leaving Early</option><option>Unable to report onsite</option></select></div>
     <div class="f"><label for="date">Date</label><input id="date" type="date" required></div>
-    <div class="f"><label for="time">Expected time <span class="opt">(optional)</span></label><input id="time" type="time"></div>
+    <div class="f"><label for="time">Expected time <span class="opt" id="timeOpt">(optional)</span></label><input id="time" type="time"></div>
     <div class="f full" id="offsetWrap" hidden><label for="offset">Onsite offset date</label><select id="offset"><option value="">Select offset date</option></select><span class="hint">Choose a weekday in the same week as your missed onsite day, or the following week.</span></div>
-    <div class="f full"><label for="why">Reason / notes <span class="opt"></span></label><textarea id="why"></textarea></div>
+    <div class="f full"><label for="why">Reason / notes</label><textarea id="why"></textarea></div>
     <div class="f full"><button id="send" type="submit">Send to managers</button></div>
     <p id="msg" class="full" role="status" aria-live="polite"></p>
   </div>
@@ -193,6 +193,10 @@ nameEl.addEventListener("focus", () => {
 document.addEventListener("pointerdown", ev => {
   if (!ev.target.closest(".ac")) sug.hidden = true;
 });
+const updateTimeLabel = () => {
+  $("timeOpt").textContent = $("type").value === "Running Late" ? "(required)" : "(optional)";
+};
+$("type").addEventListener("change", updateTimeLabel);
 const fmtLabel = s => parseD(s).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
 const updateOffset = () => {
   const on = $("type").value === ONSITE;
@@ -230,17 +234,23 @@ $("date").addEventListener("input", updateOffset);
   $("shift").innerHTML = o.join("");
   $("date").value = today();
   updateOffset();
+  updateTimeLabel();
 })();
 document.querySelectorAll("input,select,textarea").forEach(el => el.addEventListener("input", () => el.classList.remove("bad")));
 const say = (t, c) => { $("msg").textContent = t; $("msg").className = "full " + (c || ""); };
 $("f").addEventListener("submit", async e => {
   e.preventDefault();
-  const missing = ["name", "shift", "date"].filter(id => !$(id).value.trim());
+  const missing = ["name", "shift", "date", "why"].filter(id => !$(id).value.trim());
   document.querySelectorAll(".bad").forEach(el => el.classList.remove("bad"));
   if (missing.length) {
     missing.forEach(id => $(id).classList.add("bad"));
     $(missing[0]).focus();
-    return say("Please enter your name, shift start time and date.", "er");
+    return say("Please enter your name, shift start time, date and reason.", "er");
+  }
+  if ($("type").value === "Running Late" && !$("time").value) {
+    $("time").classList.add("bad");
+    $("time").focus();
+    return say("Please enter your expected time.", "er");
   }
   const typed = nameEl.value.trim().toLowerCase();
   const match = AGENTS.find(a => a[0].toLowerCase() === typed);
@@ -293,6 +303,7 @@ $("f").addEventListener("submit", async e => {
     $("why").value = ""; $("time").value = "";
     nameEl.value = ""; syncTeam(); $("type").value = "Running Late"; $("shift").value = ""; $("date").value = today();
     updateOffset();
+    updateTimeLabel();
     btn.textContent = "Sent ✓";
     setTimeout(() => { btn.disabled = false; btn.textContent = "Send to managers"; }, 5000);
   } catch (err) {
