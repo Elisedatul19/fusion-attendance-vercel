@@ -6,7 +6,6 @@ const hoursUntilShiftManila = (dateStr, shiftStr) => {
   if (!m || !d) return null;
   let h = parseInt(m[1], 10) % 12;
   if (m[3].toUpperCase() === "PM") h += 12;
-  // Manila is UTC+8 with no daylight saving, so subtract 8 hours to get UTC
   const shiftUtc = Date.UTC(+d[1], +d[2] - 1, +d[3], h - 8, parseInt(m[2], 10));
   return (shiftUtc - Date.now()) / 36e5;
 };
@@ -24,6 +23,15 @@ const offsetRange = dt => {
   return [fmtD(mon), fmtD(fri)];
 };
 
+const emailFor = name => {
+  try {
+    const map = JSON.parse(process.env.AGENT_EMAILS || "{}");
+    return map[name] || "";
+  } catch (e) {
+    return "";
+  }
+};
+
 export async function POST(request) {
   let body;
   try {
@@ -37,7 +45,12 @@ export async function POST(request) {
   if (!name || !team || !shift || !type || !date) {
     return Response.json({ error: "Missing required fields" }, { status: 400 });
   }
-
+  if (!reason || !String(reason).trim()) {
+    return Response.json({ error: "Reason is required" }, { status: 400 });
+  }
+  if (type === "Running Late" && !time) {
+    return Response.json({ error: "Expected time is required for Running Late" }, { status: 400 });
+  }
   const isOnsite = type === ONSITE;
   if (isOnsite) {
     const missed = parseD(date);
@@ -73,6 +86,13 @@ export async function POST(request) {
   ];
   if (isOnsite) facts.push({ title: "Onsite offset date", value: offsetDate });
 
+  const cardBody = [
+    { type: "TextBlock", text: "Attendance Notice", weight: "Bolder", size: "Large" },
+    { type: "FactSet", facts },
+  ];
+  const email = emailFor(name);
+  if (email) cardBody.push({ type: "TextBlock", text: email, isVisible: false });
+
   const card = {
     type: "message",
     attachments: [
@@ -83,9 +103,28 @@ export async function POST(request) {
           $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
           type: "AdaptiveCard",
           version: "1.4",
-          body: [
-            { type: "TextBlock", text: "Attendance Notice", weight: "Bolder", size: "Large" },
-            { type: "FactSet", facts },
+          body: cardBody,
+          actions: [
+            {
+              type: "Action.Submit",
+              title: isOnsite ? "Plotted" : "Confirmed",
+              style: "positive",
+              data: {
+                action: isOnsite ? "plotted" : "confirmed",
+                agentEmail: email,
+                agentName: name
+              }
+            },
+            {
+              type: "Action.Submit",
+              title: "Denied",
+              style: "destructive",
+              data: {
+                action: "denied",
+                agentEmail: email,
+                agentName: name
+              }
+            }  
           ],
         },
       },
